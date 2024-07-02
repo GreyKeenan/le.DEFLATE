@@ -38,7 +38,6 @@ RELATING TO PNGs:
 
 					! NOT USED FOR DECOMPRESSION
 						indicates if recompression could be useful
-?						(I dont understand how that could work but cool)
 	
 	"compressed data"
 		for CM8, is DEFLATE format according to the DEFLATE spec (doc above)
@@ -134,4 +133,108 @@ extra rules for Huffman coding
 	outlinse sequence of events for decoding data
 	
 3.2.4 non-compressed blocks
+	raw data preceded by 4 bytes:
+		2 bytes = length
+		2 bytes = !length (ones complement)
+			[seems wasteful nowadays]
+			as a check against length for corrupted data. yep thats it
+		[dont forget is little endian]
+
+3.2.5 Compressed Blocks
+	[doesnt explicitly mention they are also preceded by length & !length, but can be inferred]
+
+	to allow lz77's repeated string denotion, Alphabet for huffman encoding is:
+		0-255 for actual byte values
+		256 for EndOfBlock
+		257-285 for "length codes"
+			
+			which will specify (according to a table, p12) additional subsequent bytes which are part of the length, depending on length
+
+?		[ Are the distance codes simply placed immediately following any identified length codes ]
+			Yes. after the length-extensions ofcc
+
+
+3.2.6 Compression with fixed huffman codes
+	FOR FIXED CODES, BTYPE = 01
+
+	...
+
+3.2.7 Compression with dynamic Huffman codes
 	
+	13 bits for various counts of code-lengths
+		5 : # of literal/length codes - 257
+			represent values 257-286
+		5 : # of distance codes - 1
+			represent values 1-32
+
+			Im so stupid. I will not elaborate. No proof shall ever exist.
+
+		4 HCLEN : # of codeLength-codes - 4
+			(for the second-level huffman tree over the tree for the compressed data)
+				
+	codeLength-code lengths
+		(HCLEN + 4) * 3 bits long
+			(since each length is a 3-bit integer)
+
+			order: 16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15
+	
+	code lengths for the byte-literals and lengths
+		HLIT + 257 codes long
+
+	code lengths for the 'distance alphabet'
+		HDIST + 1 codes long
+
+	
+	
+
+structural overview
+	
+	3 bit header
+	32bit length (16 & 16)
+	var bytes of data (up to 2^16-1)
+		13 + var bits tree encodings
+		actual data
+		terminating code
+
+	^DEFLATE
+
+	zlib:
+
+		16bit header (CMF, FLG)
+		(possible) 8bit DICTID
+		DEFLATEd data
+		32bit Adler32 checksum
+
+	png IDAT chunk:
+		
+		32bit length
+		32bit identifier (IDAT)
+		zlib data
+		32bit CRC
+
+		always zlib CM == 8
+
+
+
+
+
+
+
+
+Source: https://zlib.net/feldspar.html
+	
+	Very useful for visualizing lz77
+
+	(goes over huffman/lz77 combination as above)
+
+	encoding trees alongside the data:
+		as explained above, when trees are encoded alongside the data, they are represented by a sequence of code-lengths, to be reconstructed.
+		Additionally, this sequence (representing the tree to decode the compressed data) is further-compressed by another huffman tree.
+			that other tree is then stored again.
+			its values are in a special order:
+				16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15
+				last-listed elements are most likely to be 0, in which case they can be excluded
+
+				these are 3-bit integers
+
+	with that, let me go back to 3.2.7 and see if I can understand better
