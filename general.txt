@@ -40,11 +40,21 @@ extra rules for Huffman coding
 	1) blc for 2,1,3,3 = [0, 1, 1, 2] 
 		blc[x] = countOfHuffmancodesWithThatManyDigits
 
-	2) creates [X, 0, 10, 110]
+	2) creates [X, 0, 10, 110] (aka 0,2,6)
 		I am 99% sure MAX_BITS = 3 for the largest-digitted huffmancode
 		note, is "smallest code for each code length", not each code length
 
 		ig next_code[0] is undefined? since we start writing at index 1.
 
-	3) I dont understand what tree[].Len and .Code represent. Its midnight. Im taking a break and that break is called sleep.
+	3) creates [10, 0, 110, 111] (aka 2,0,6,7)
+		(refer to earlier)
+			tree[I].Len = bitlength for each code. Lengths in this ex would be 2,1,3,3 from above
+				(so I presume tree[I] only lists actual symbol/code items, not all possible tree indices including the nodes)
+				^ how are they ordered then? 
+				they are ordered as in the example. Sequentially based off of the symbol ordering
+			tree[I].Code = the huffman code thing. thats it
 
+		is max_code just the number of codes?
+			yes, it must be
+
+		increments next_code[len] so that the next code is incremented. Duh you stupid idiot
