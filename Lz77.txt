@@ -1,0 +1,8 @@
+
+Info about Lz77 generally, not specific to DEFLATE
+
+
+Abstractly:
+	identifies repeated sequences/data & replaces it with a reference to a single instance of that data
+
+	as reading to encode, looking back through prev X bytes of information for repeated data can become expensive

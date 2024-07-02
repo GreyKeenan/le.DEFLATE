@@ -1,0 +1,50 @@
+
+https://www.rfc-editor.org/rfc/rfc1951
+	
+	1951 1.3 'standard'/explanation of how DEFLATE works
+
+
+general:
+
+	DEFLATE combines HuffmanCoding (see bigbadwolf) and Lz77 (see dir) to compress stuff
+
+	encoding: lz77 then huffman coding
+
+
+bit-byte ordering:
+
+	see 3.1.1 of doc
+
+	multi-byte value have least-significant byte first
+
+	bits packed least-to-most-significant
+		EXCEPT huffman codes, which are packed most-to-least
+			[? is this just so you can read them sequentially visually better ?]
+
+
+
+extra rules for Huffman coding 
+	see 3.2.2
+
+	2 extra rules:
+		shorter codes must be less than longer codes. eg: cannot have '1' as a huffman code & '00'. But, could have '0' and '10'
+			(ofc this is not always necessarily the case without this restriction)
+		codes of the same length (eg 110 and 111) must refer back to lexicographically-sequential values.
+			eg: 110=>A & 111=>B but not: 110=>B & 111=>A
+
+	these rules allow the codes to be stored more efficiently and mapped back to their respective values more efficiently/deterministically
+
+
+3.2.2 also outlines pseudocode for how to use these rules to store/calculate the huffman tree
+	
+	1) blc for 2,1,3,3 = [0, 1, 1, 2] 
+		blc[x] = countOfHuffmancodesWithThatManyDigits
+
+	2) creates [X, 0, 10, 110]
+		I am 99% sure MAX_BITS = 3 for the largest-digitted huffmancode
+		note, is "smallest code for each code length", not each code length
+
+		ig next_code[0] is undefined? since we start writing at index 1.
+
+	3) I dont understand what tree[].Len and .Code represent. Its midnight. Im taking a break and that break is called sleep.
+
